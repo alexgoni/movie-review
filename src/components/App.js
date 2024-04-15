@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReviewList from "./ReviewList";
 import { getReviews } from "../api";
+import ReviewForm from "./ReviewForm";
 
 const LIMIT = 6;
 
@@ -37,10 +38,9 @@ export default function App() {
     if (options.offset === 0) {
       setItems(reviews);
     } else {
-      setItems([...items, ...reviews]);
+      setItems((prev) => [...prev, ...reviews]);
     }
-
-    setOffset(options.offset + reviews.length);
+    setOffset(reviews.length + options.offset);
     setHasNext(paging.hasNext);
   };
 
@@ -58,6 +58,7 @@ export default function App() {
         <button onClick={() => setOrder("createdAt")}>최신순</button>
         <button onClick={() => setOrder("rating")}>평점순</button>
       </div>
+      <ReviewForm />
       <ReviewList items={sortedItems} onDelete={handleDelete} />
       {hasNext && (
         <button disabled={isLoading} onClick={handleLoadMore}>
