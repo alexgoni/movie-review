@@ -2,14 +2,25 @@ import { useState } from "react";
 import "./ReviewForm.css";
 import FileInput from "./FileInput";
 import RatingInput from "./RatingInput";
+import { createReview } from "../api";
+import useAsync from "../hooks/useAsync";
 
-function ReviewForm() {
-  const [values, setValues] = useState({
-    title: "",
-    rating: 0,
-    content: "",
-    imgFile: null,
-  });
+const INITIAL_VALUES = {
+  title: "",
+  rating: 0,
+  content: "",
+  imgFile: null,
+};
+
+function ReviewForm({
+  initialValues = INITIAL_VALUES,
+  initialPreview,
+  onSubmitSuccess,
+  onCancel,
+  onSubmit,
+}) {
+  const [values, setValues] = useState(initialValues);
+  const [isSubmitting, submitingError, onSubmitAsync] = useAsync(onSubmit);
 
   const handleChange = (name, value) => {
     setValues((prev) => ({
@@ -23,8 +34,20 @@ function ReviewForm() {
     handleChange(name, value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("rating", values.rating);
+    formData.append("content", values.content);
+    formData.append("imgFile", values.imgFile);
+
+    const result = await onSubmitAsync(formData);
+    if (!result) return;
+    const { review } = result;
+    onSubmitSuccess(review);
+    setValues(INITIAL_VALUES);
   };
 
   return (
@@ -33,6 +56,7 @@ function ReviewForm() {
         name="imgFile"
         value={values.imgFile}
         onChange={handleChange}
+        initialPreview={initialPreview}
       />
       <input name="title" value={values.title} onChange={handleInputChange} />
       <RatingInput
@@ -45,7 +69,11 @@ function ReviewForm() {
         value={values.content}
         onChange={handleInputChange}
       />
-      <button type="submit">확인</button>
+      {onCancel && <button onClick={onCancel}>취소</button>}
+      <button type="submit" disabled={isSubmitting}>
+        확인
+      </button>
+      {submitingError?.message && <div>{submitingError.message}</div>}
     </form>
   );
 }
