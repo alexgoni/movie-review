@@ -3,6 +3,8 @@ import ReviewList from "./ReviewList";
 import { createReview, getReviews, updateReview, deleteReview } from "../api";
 import ReviewForm from "./ReviewForm";
 import useAsync from "../hooks/useAsync";
+import { LocaleProvider } from "../contexts/LocaleContext";
+import LocaleSelector from "./LocaleSelector";
 
 const LIMIT = 6;
 
@@ -60,7 +62,8 @@ export default function App() {
   }, [order, handleLoad]);
 
   return (
-    <div>
+    <LocaleProvider defaultValue={"ko"}>
+      <LocaleSelector />
       <div>
         <button onClick={() => setOrder("createdAt")}>최신순</button>
         <button onClick={() => setOrder("rating")}>평점순</button>
@@ -81,6 +84,6 @@ export default function App() {
         </button>
       )}
       {loadingError?.messages && <span>{loadingError?.messages}</span>}
-    </div>
+    </LocaleProvider>
   );
 }

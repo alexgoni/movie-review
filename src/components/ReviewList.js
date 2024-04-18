@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Rating from "./Rating";
 import "./ReviewList.css";
 import ReviewForm from "./ReviewForm";
+import useTranslate from "../hooks/useTranslate";
 
 function formatDate(value) {
   const date = new Date(value);
@@ -9,6 +10,8 @@ function formatDate(value) {
 }
 
 function ReviewListItem({ item, onDelete, onEdit }) {
+  const translate = useTranslate();
+
   return (
     <div className="ReviewListItem">
       <img className="ReviewListItem-img" src={item.imgUrl} alt={item.title} />
@@ -17,8 +20,12 @@ function ReviewListItem({ item, onDelete, onEdit }) {
         <Rating value={item.rating} />
         <p>{formatDate(item.createdAt)}</p>
         <p>{item.content}</p>
-        <button onClick={() => onDelete(item.id)}>삭제</button>
-        <button onClick={() => onEdit(item.id)}>수정</button>
+        <button onClick={() => onDelete(item.id)}>
+          {translate("delete button")}
+        </button>
+        <button onClick={() => onEdit(item.id)}>
+          {translate("edit button")}
+        </button>
       </div>
     </div>
   );
